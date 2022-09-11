@@ -1,66 +1,48 @@
+require 'pry'
 class ApplicationController < Sinatra::Base
-  set :default_content_type, 'application/json'
-  
   # Add your routes here
-  #recipe route
+  # Post routes
   get "/recipes" do
-   recipes = Recipe.all
-   recipes.to_json 
+    recipe = Recipe.all
+    recipe.to_json(include: :reviews)
   end
-
   post "/recipes" do
-    reserved = Recipe.create(
-      name: params[:name],
-      author: params[:author]
-      
+    recipe = Recipe.create(
+     name: params[:name],
+      author: params[:author],
+  ingredients: params[:ingredients]
     )
-    reserved.to_json
-end
-
-patch "/recipes/:id" do
-  recipe = Recipe.find(params[:id])
+    recipe.to_json
+  end
+  patch "/recipes/:id" do
+    recipe = Recipe.find(params[:id])
     recipe.update(
       name: params[:name],
-      author: params[:author]
+      author: params[:author],
+     ingredients: params[:ingredients]
     )
     recipe.to_json
   end
-
   delete "/recipes/:id" do
     recipe = Recipe.find(params[:id])
-    recipe.destroy
+    recipe.delete
     recipe.to_json
   end
-
-  #review routes
-  get "/reviews" do
-    reviews = Review.all
-    reviews.to_json
-  end
-
-  post "/reviews" do
-    new_review = Review.create(
-      body: params[:body]
-    )
-    new_review.to_json
-  end
-
-  patch "/reviews/:id" do
-    reviews = Review.find(params[:id])
-    reviews.update(
-      comment: params[:comment]
-    )
-    reviews.to_json
-  end
-
   delete "/reviews/:id" do
-    reviews = Review.find(params[:id])
-    reviews.destroy
-    reviews.to_json
+    recipe = Review.find(params[:id])
+    recipe.delete
+    recipe.to_json
   end
-  
+  # reader_reviews routes
+  get "/reviews" do
+    recipe = Review.all
+    recipe.to_json
+  end
+  post "/reviews" do
+    recipe = Review.create(
+      comment: params[:comment],
+      recipe_id: params[:recipe_id]
+    )
+    recipe.to_json
+  end
 end
-
-
-
-
